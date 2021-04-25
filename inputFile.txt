@@ -1,0 +1,1 @@
+(1 + 2 \ \*lululzz*\ := read write 3 * 4 - 5)
