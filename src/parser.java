@@ -99,6 +99,9 @@ class parser {
             parseFactor(list);
             parseFactTail(list);
         }
+        else {
+            //toss error
+        }
     }
 
     public void parseFactTail(ArrayList<token> list){
@@ -113,12 +116,38 @@ class parser {
     }
 
     public void parseFactor(ArrayList<token> list){
+        //TODO
     }
 
     public void parseAddOp(ArrayList<token> list){
+        String operator = "+";
+        if(list.get(index).get().equals("minus"))
+            operator = "-";
+        if(raiseIndex(index,list)){
+            if(list.get(index).get().equals("minus") || list.get(index).get().equals("plus")){
+                indent++;
+                System.out.println(getIndent(indent) + "<AddOp>");
+                indent++;
+                System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
+                indent++;
+                System.out.println(getIndent(indent) + operator);
+                indent--;
+                System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
+                indent--;
+                System.out.println(getIndent(indent) + "</AddOp>");
+                indent--;
+            }
+            else{
+                //toss error
+            }
+        }
+        else{
+            //toss error
+        }
     }
 
     public void parseMultOp(ArrayList<token> list){
+        //TODO
     }
 
     public void parseID(ArrayList<token> list){
