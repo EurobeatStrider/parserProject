@@ -236,39 +236,42 @@ class token
 
 class parser {
     private int indent = 0;
+    private int index = 0;
     private String output = "";
     private ArrayList parserTokens = new ArrayList<token>();
 
-    public void parseProgram(token current){
+    public void parseProgram(ArrayList<token> list){
         pushToken("<Program>");
         indent++;
-        parseStmtList(current);
+        parseStmtList(list);
         indent--;
         pushToken("</Program>");
     }
 
-    public void parseStmtList(token current){
+    public void parseStmtList(ArrayList<token> list){
         pushToken("<Stmt_List>");
         indent++;
-        if(current != null) {
-            parseStmt(current);
-            parseStmtList(current);
+        if(index <= list.size()) { //Possible error point.
+            parseStmt(list);
+            parseStmtList(list);
         }
         indent--;
         pushToken("<Stmt_List>");
     }
 
-    public void parseStmt(token current){
+    public void parseStmt(ArrayList<token> list){
         pushToken("<Stmt>");
         indent++;
-        if(current.get().equals("id")){
+        if(list.get(index).equals("id")){
             pushToken("<ID>");
             indent++;
-            pushToken(current.getID());
+            pushToken(list.get(index).getID());
+            if(index < list.size())
+                index++;
             indent--;
             pushToken("/ID");
         }
-        if(current.get().equals("read")){
+        if(list.get(index).equals("read") || list.get(index).equals("write")){
 
         }
         else{
@@ -279,25 +282,25 @@ class parser {
         pushToken("</Stmt>");
     }
 
-    public void parseExpr(token current){
+    public void parseExpr(ArrayList<token> list){
     }
 
-    public void parseTermTail(token current){
+    public void parseTermTail(ArrayList<token> list){
     }
 
-    public void parseTerm(token current){
+    public void parseTerm(ArrayList<token> list){
     }
 
-    public void parseFactTail(token current){
+    public void parseFactTail(ArrayList<token> list){
     }
 
-    public void parseFactor(token current){
+    public void parseFactor(ArrayList<token> list){
     }
 
-    public void parseAddOp(token current){
+    public void parseAddOp(ArrayList<token> list){
     }
 
-    public void parseMultOp(token current){
+    public void parseMultOp(ArrayList<token> list){
     }
 
     void pushToken(String type)
@@ -307,5 +310,10 @@ class parser {
         parserTokens.add(newToken);
     }
 
+}
+
+class parserToken {
+    String type;
+    int indent;
 
 }
