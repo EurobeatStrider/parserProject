@@ -241,48 +241,69 @@ class parser {
     private ArrayList parserTokens = new ArrayList<token>();
 
     public void parseProgram(ArrayList<token> list){
-        pushToken("<Program>");
+        System.out.println(getIndent(indent) +"<Program>");
         indent++;
         parseStmtList(list);
         indent--;
-        pushToken("</Program>");
+        System.out.println(getIndent(indent) +"</Program>");
     }
 
     public void parseStmtList(ArrayList<token> list){
-        pushToken("<Stmt_List>");
+        System.out.println(getIndent(indent) +"<Stmt_List>");
         indent++;
         if(index <= list.size()) { //Possible error point.
             parseStmt(list);
             parseStmtList(list);
         }
         indent--;
-        pushToken("<Stmt_List>");
+        System.out.println(getIndent(indent) +"<Stmt_List>");
     }
 
     public void parseStmt(ArrayList<token> list){
-        pushToken("<Stmt>");
+        System.out.println(getIndent(indent) +"<Stmt>");
         indent++;
-        if(list.get(index).equals("id")){
-            pushToken("<ID>");
-            indent++;
-            pushToken(list.get(index).getID());
-            if(index < list.size())
+        if(list.get(index).equals("id")){ //Form must be 'id' 'assign' <expr>
+            parseID(list); //Parse ID
+            index++; //advances to next token.
+            if(list.get(index).equals("=")) { //Checks to make sure the input is right
+                System.out.println(getIndent(indent) + "<Assign>");
                 index++;
-            indent--;
-            pushToken("/ID");
+                System.out.println(getIndent(indent) + list.get(index).get()); //Prints the "="
+                index--;
+                System.out.println(getIndent(indent) + "</Assign>");
+                parseExpr(list); //Advances to expr parser.
+            }
+            else{
+                //toss error here
+            }
         }
-        if(list.get(index).equals("read") || list.get(index).equals("write")){
-
+        if(list.get(index).equals("read")){ //Form must be 'read' <id>
+            System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).get());
+            indent--;
+            System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
+            index++; //Advance index.
+            parseID(list); //ID Check
+        }
+        if(list.get(index).equals("write")){ //Form must be 'write' <expr>
+            System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).get());
+            indent--;
+            System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
+            index++; //Advance index.
+            parseExpr(list); //Parse Expression
         }
         else{
             //Toss an error here.
         }
-
         indent--;
-        pushToken("</Stmt>");
+        System.out.println(getIndent(indent) + "</Stmt>");
     }
 
     public void parseExpr(ArrayList<token> list){
+
     }
 
     public void parseTermTail(ArrayList<token> list){
@@ -303,17 +324,25 @@ class parser {
     public void parseMultOp(ArrayList<token> list){
     }
 
-    void pushToken(String type)
-    {
-        token newToken = new token();
-        newToken.set(type);
-        parserTokens.add(newToken);
+    public void parseID(ArrayList<token> list){
+        if(list.get(index).get() == "id"){
+            System.out.println(getIndent(indent) + "<ID>");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).getID());
+            indent--;
+            System.out.println(getIndent(indent) + "</ID>");
+        }
+        else {
+            //Toss error!
+        }
     }
 
-}
-
-class parserToken {
-    String type;
-    int indent;
+    private String getIndent(int indent) {
+        String out = "";
+        for(int i = 0; i < indent; i++) {
+            out += "\t";
+        }
+        return out;
+    }
 
 }
