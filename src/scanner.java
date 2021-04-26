@@ -1,137 +1,190 @@
+/*
+* Project 2 parse v1.0
+*
+ */
+
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.*;
 
 public class scanner
 {
-    public static void main(String args[]) throws IOException
+    public static void main(String[] args) throws IOException
     {
         scanLogic newScan = new scanLogic();
-        String rawInput = "";
+        StringBuilder rawInput = new StringBuilder();   //content of file
         File inputFile = new File("inputFile.txt");
         Scanner reader = new Scanner(inputFile);
 
-        //
+
         while(reader.hasNext())
-        {
-            rawInput += reader.nextLine();
-        }
-        rawInput += "$$";
+            rawInput.append(reader.nextLine());
+
+
         reader.close();
 
 
-        char input[] = new char[rawInput.length()];
 
-        for(int i = 0; i < rawInput.length(); i++)
+        /*for(int i = 0; i < rawInput.length(); i++)
         {
             input[i] = rawInput.charAt(i);
             System.out.println("Char found as " + input[i]);
-        }
-        System.out.println(rawInput);
-        newScan.scan(input);
+        }*/
+
+        newScan.scan(rawInput.toString());
     }
 }
 
 class scanLogic
 {
-    private boolean tossError = false;
-    private boolean foundEnd = false;
-    private int indent = 0;
-    ArrayList<token> tokens = new ArrayList<token>();
-    private int pos = 0;
+    public static final Dictionary<String, String> operatorTypes;
+    private final ArrayList<token> tokens;
 
-    private final Pattern intPat = Pattern.compile("\\d");
-    private final Pattern wordPat = Pattern.compile("\\w");
-    private Matcher match;
+    private boolean tossError;
+    private int pos;
+    //will be used to 1 or 2 characters
+    private final Pattern whiteSpacePattern = Pattern.compile("[ \\t\\n]");             //any new line, tab space or whitespace character
+    private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");      //any digit or float
+    private final Pattern wordPattern = Pattern.compile("\\w");                         //any word character
+    private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
 
-    public void scan(char input[])
+    private Matcher match;  //may not needed
+
+    static {
+        operatorTypes = new Hashtable<>();
+        operatorTypes.put(":=", "assign");
+        operatorTypes.put("+", "plus");
+        operatorTypes.put("-", "minus");
+        operatorTypes.put("*", "times");
+        operatorTypes.put("(", "lparen");
+        operatorTypes.put(")", "rparen");
+    }
+
+    public scanLogic() {
+        tokens = new ArrayList<>();
+        tossError = false;
+    }
+
+    //Global Scannner
+    public void scan(String input)
     {
-		for(int pos = 0; pos < input.length && !tossError; pos++) {
-            System.out.println("Checking character " + input[pos]);
-            if (input[pos] == ' ' || input[pos] == '\n' || input[pos] == '\t')
+		for(pos = 0; pos < input.length() && !tossError; pos++) {
+            //System.out.println("Checking character " + input[pos]);
+            //if (input.charAt(pos) == ' ' || input.charAt(pos) == '\n' || input.charAt(pos) == '\t')
+
+            //check for new line, tab and whitespace characters
+            if(checkMatch(input.charAt(pos), whiteSpacePattern))
                 System.out.println("Whitespace lul");
-            else if (input[pos] == '\\')
+
+            //check for comment
+            else if (input.charAt(pos) == '/')
                 divCom(input);
-            else if (input[pos] == '*' || input[pos] == '+' || input[pos] == '-' || input[pos] == '(' || input[pos] == ')')
-                opFour(input);
-            else if (input[pos] == ':' || input[pos] == '=')
+
+            //check for plus, minus, times, lparen, rparen
+            else if(checkMatch(input.charAt(pos), operatorPattern)) //((operatorPattern.matcher(Character.toString(input.charAt(pos)))).find())
+                pushToken(operatorTypes.get(Character.toString(input.charAt((pos)))));
+
+            //check for assign
+            else if (input.charAt(pos) == ':')
                 detAssign(input);
-            else if (supportNumber(input[pos]))
-                detDigit(input);
-            else if (input[pos] != '$')
-                idDetector(input);
-            else if (input[pos] == '$' && input[pos + 1] == '$') {
-                pushToken("$$");
+
+            //check for digit or float type number
+            //if a period is spotted then check if next character is a digit, else toss error
+            else if(input.charAt(pos) == '.' || ) {
+                if (checkMatch(input.charAt(pos+1), digitPattern))
+                {
+                    detDigit(input);
+                    continue;
+                }
+                tossError = true;
             }
+
         }
 
         if(tossError)
+        {
             System.out.println("An error occurred. Please remember to close comments and to make sure : properly assigns.");
-        else
+            System.out.printf("Invalid syntax at %d\n", pos);
+        }
+            else
             getTokens();
 
     }
 
-    //Checks for comments in code
-    void divCom(char input[])
+    //Checks for comment given that current position variable (pos), is positioned a forwards slash(/)
+    void divCom(String input)
     {
-        System.out.println("Checking as \\");
-        if(input[pos+1] == '*')
-        {
-            pos+=2;
-            while((input[pos] != '*' && input[pos+1] != '\\'))
-            {
+        String divType = null;
+        System.out.println("Checking for div or comment");
+
+
+        if(pos < input.length() - 1)            //prevents index out of bounds error
+            divType = input.substring(pos, pos+1);
+
+        //checks if substring equals '/*'
+        if(divType != null && divType.equals("/*")) {
+            int prev = pos; //for debugging
+            pos += 2;
+            while (pos < input.length() - 1 && !input.substring(pos, pos + 1).equals("*/"))
                 pos++;
-            }
-            pos+=2;
+            pos++; // only increment one because scan function loop will handle the rest
+
+            System.out.printf("Comment found from from %d to %d", prev, pos);
+            return;
         }
 
-        else if(input[pos+1] == '\\')
-        {
-            pos+=2;
-            while((input[pos+1] == '\n'))
-            {
+        if(divType.equals("//")) {
+            System.out.printf("Div operator found at %d\n", pos);
+            pos += 2;
+            while (input.charAt(pos) != '\n')
                 pos++;
-            }
-            pos+=2;
+            return;
         }
-        else
-        {
-            pushToken("\\");
-        }
+
+        pushToken("div");
+    }
+
+    private boolean checkMatch(char operator, Pattern regexPattern)
+    {
+        return regexPattern.matcher(Character.toString(operator)).find();
     }
 
     //Checks for specified tokenn
-    void opFour(char input[])
+    void opFour(String input[])
     {
-        System.out.println("Found operator");
         //an operator had to be tossed here
-        if(input[pos] == '+')
+        if(input[pos] == "+")
             pushToken("plus");
-        if(input[pos] == '-')
+        if(input[pos] == "-")
             pushToken("minus");
-        if(input[pos] == '*')
+        if(input[pos] == "*")
             pushToken("times,");
-        if(input[pos] == '(')
+        if(input[pos] == "(")
             pushToken("(");
-        if(input[pos] == ')')
+        if(input[pos] == ")")
             pushToken(")");
     }
 
     //Checks for assign tokens
-    boolean detAssign(char input[])
+    boolean detAssign(String input)
     {
-        System.out.println("Found assign");
-        if(input[pos+1] == '=')
+        String subStr = null;
+        if (pos < input.length() - 1)           //prevent index out of bounds error
+            subStr= input.substring(pos, pos+1);
+
+        if(subStr != null && subStr.equals(":="))
         {
-            pos++;
-            pushToken("=");
-            return false;
-        }
-        else
+            pushToken(operatorTypes.get(subStr));
             return true;
+        }
+        tossError = true;
+
+        return tossError;
     }
 
     //Cheeckw for digits
@@ -141,24 +194,24 @@ class scanLogic
         String insert = "";
         insert += input[pos];
         boolean decFound = false;
-        if(input[pos] == '.')
+        if(input[pos] == ".")
             decFound = true;
-        while(supportNumber(input[pos+1]) && (input[pos+1] != '*' || !decFound))
+        while(supportNumber(input[pos+1]) && (input[pos+1] != "*" || !decFound))
         {
             insert += input[pos+1];
-            if(input[pos+1] == '*')
+            if(input[pos+1] == "*")
                 decFound = true;
             pos++;
         }
         pushToken(insert);
     }
 
-    void idDetector(char input[])
+    void detID(String[] input)
     {
         System.out.println("Finding ID");
         String current = "";
         current += input[pos];
-        while(supportLetter(input[pos+1]) && input[pos+1] != '!')
+        while(supportLetter(input[pos+1]) && input[pos+1] != "!")
         {
             current += input[pos+1];
             if(current.equals("read"))
@@ -171,10 +224,11 @@ class scanLogic
             }
             pos++;
         }
-        if(current.equals("read") == false && current.equals("write") == false)
+        if(!current.equals("read") && !current.equals("write"))
             pushIDToken("id", current);
     }
 
+    //TODO
     void pushToken(String type)
     {
         token newToken = new token();
@@ -198,14 +252,14 @@ class scanLogic
         }
     }
 
-    boolean supportNumber(char input)
+    boolean supportNumber(String input)
     {
-        match = intPat.matcher(Character.toString(input));
+        match = digitPattern.matcher(input);
         return match.find();
     }
-    boolean supportLetter(char input)
+    boolean supportLetter(String input)
     {
-        match = wordPat.matcher(Character.toString(input));
+        match = wordPattern.matcher(input);
         return match.find();
     }
 }
@@ -214,6 +268,15 @@ class token
 {
     String type;
     String id;
+    String value;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 
     public void set(String type)
     {
