@@ -42,27 +42,29 @@ public class scanner
 
 class scanLogic
 {
-    public static final Dictionary<String, String> operatorTypes;
-    private final ArrayList<token> tokens;
+
+    public static final Dictionary<String, String> tokenTypes;                          //Holds pair for tokens <actual token, associator >
+    private final ArrayList<Token> tokens;
 
     private boolean tossError;
     private int pos;
-    //will be used to 1 or 2 characters
+
     private final Pattern whiteSpacePattern = Pattern.compile("[ \\t\\n]");             //any new line, tab space or whitespace character
-    private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");      //any digit or float
+    private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");    //any digit or float
     private final Pattern wordPattern = Pattern.compile("\\w");                         //any word character
     private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
 
     private Matcher match;  //may not needed
 
+
     static {
-        operatorTypes = new Hashtable<>();
-        operatorTypes.put(":=", "assign");
-        operatorTypes.put("+", "plus");
-        operatorTypes.put("-", "minus");
-        operatorTypes.put("*", "times");
-        operatorTypes.put("(", "lparen");
-        operatorTypes.put(")", "rparen");
+        tokenTypes = new Hashtable<>();
+        tokenTypes.put(":=", "assign");
+        tokenTypes.put("+", "plus");
+        tokenTypes.put("-", "minus");
+        tokenTypes.put("*", "times");
+        tokenTypes.put("(", "lparen");
+        tokenTypes.put(")", "rparen");
     }
 
     public scanLogic() {
@@ -78,8 +80,14 @@ class scanLogic
             //if (input.charAt(pos) == ' ' || input.charAt(pos) == '\n' || input.charAt(pos) == '\t')
 
             //check for new line, tab and whitespace characters
-            if(checkMatch(input.charAt(pos), whiteSpacePattern))
+            if(checkMatch(input.charAt(pos), whiteSpacePattern)) {
                 System.out.println("Whitespace lul");
+                continue;
+            }
+
+            //checks for id
+            if (checkMatch(input.charAt(pos), wordPattern))
+                detID(input);
 
             //check for comment
             else if (input.charAt(pos) == '/')
@@ -87,7 +95,8 @@ class scanLogic
 
             //check for plus, minus, times, lparen, rparen
             else if(checkMatch(input.charAt(pos), operatorPattern)) //((operatorPattern.matcher(Character.toString(input.charAt(pos)))).find())
-                pushToken(operatorTypes.get(Character.toString(input.charAt((pos)))));
+                //pushToken(tokenTypes.get(Character.toString(input.charAt((pos)))));
+                pushToken(new Token(tokenTypes.get(Character.toString(input.charAt(pos))), null));
 
             //check for assign
             else if (input.charAt(pos) == ':')
@@ -95,14 +104,11 @@ class scanLogic
 
             //check for digit or float type number
             //if a period is spotted then check if next character is a digit, else toss error
-            else if(input.charAt(pos) == '.' || ) {
-                if (checkMatch(input.charAt(pos+1), digitPattern))
-                {
-                    detDigit(input);
-                    continue;
-                }
-                tossError = true;
+            else if(checkMatch(input.charAt(pos), digitPattern) || input.charAt(pos) == '.') {
+                detDigit(input);
             }
+
+            else
 
         }
 
@@ -146,7 +152,7 @@ class scanLogic
             return;
         }
 
-        pushToken("div");
+        pushToken(new Token(tokenTypes.get(Character.toString(input.charAt(pos))), null));
     }
 
     private boolean checkMatch(char operator, Pattern regexPattern)
@@ -154,7 +160,7 @@ class scanLogic
         return regexPattern.matcher(Character.toString(operator)).find();
     }
 
-    //Checks for specified tokenn
+    //function unnecessary as of dictionary implementati on
     void opFour(String input[])
     {
         //an operator had to be tossed here
@@ -179,11 +185,11 @@ class scanLogic
 
         if(subStr != null && subStr.equals(":="))
         {
-            pushToken(operatorTypes.get(subStr));
+            //pushToken(operatorTypes.get(subStr));
+            pushToken(new Token(tokenTypes.get(subStr), null));
             return true;
         }
         tossError = true;
-
         return tossError;
     }
 
@@ -206,7 +212,7 @@ class scanLogic
         pushToken(insert);
     }
 
-    void detID(String[] input)
+    void detID(String input)
     {
         System.out.println("Finding ID");
         String current = "";
@@ -229,15 +235,15 @@ class scanLogic
     }
 
     //TODO
-    void pushToken(String type)
+    void pushToken(Token token)
     {
-        token newToken = new token();
-        newToken.set(type);
-        tokens.add(newToken);
+        if(token != null)
+            tokens.add(token);
     }
+    void
 
     void pushIDToken(String type, String id) {
-        token idToken = new token();
+        Token idToken = new Token();
         idToken.setID(type, id);
         tokens.add(idToken);
     }
@@ -246,10 +252,14 @@ class scanLogic
     {
         //We need the parser logic
 
-        for(token current : tokens)
+        for(Token current : tokens)
         {
             System.out.print(current.get() + " ");
         }
+    }
+
+    public static Dictionary<String, String> getTokenTypes() {
+        return tokenTypes;
     }
 
     boolean supportNumber(String input)
@@ -264,11 +274,23 @@ class scanLogic
     }
 }
 
-class token
+class Token
 {
-    String type;
-    String id;
-    String value;
+    private String type;
+    private String id;
+    private String value;
+
+    public Token() {
+        type = null;
+        id = null;
+        value = null;
+    }
+
+    public Token(String type, String value) {
+        this.type = type;
+        this.value = value;
+        id = null;
+    }
 
     public String getValue() {
         return value;
@@ -294,15 +316,14 @@ class token
     {
         return id;
     }
-
 }
 
 class parser {
     private int indent = 0;
     private String output = "";
-    private ArrayList parserTokens = new ArrayList<token>();
+    private ArrayList parserTokens = new ArrayList<Token>();
 
-    public void parseProgram(token current){
+    public void parseProgram(Token current){
         pushToken("<Program>");
         indent++;
         parseStmtList(current);
@@ -310,7 +331,7 @@ class parser {
         pushToken("</Program>");
     }
 
-    public void parseStmtList(token current){
+    public void parseStmtList(Token current){
         pushToken("<Stmt_List>");
         indent++;
         if(current != null) {
@@ -321,7 +342,7 @@ class parser {
         pushToken("<Stmt_List>");
     }
 
-    public void parseStmt(token current){
+    public void parseStmt(Token current){
         pushToken("<Stmt>");
         indent++;
         if(current.get().equals("id")){
@@ -342,30 +363,30 @@ class parser {
         pushToken("</Stmt>");
     }
 
-    public void parseExpr(token current){
+    public void parseExpr(Token current){
     }
 
-    public void parseTermTail(token current){
+    public void parseTermTail(Token current){
     }
 
-    public void parseTerm(token current){
+    public void parseTerm(Token current){
     }
 
-    public void parseFactTail(token current){
+    public void parseFactTail(Token current){
     }
 
-    public void parseFactor(token current){
+    public void parseFactor(Token current){
     }
 
-    public void parseAddOp(token current){
+    public void parseAddOp(Token current){
     }
 
-    public void parseMultOp(token current){
+    public void parseMultOp(Token current){
     }
 
     void pushToken(String type)
     {
-        token newToken = new token();
+        Token newToken = new Token();
         newToken.set(type);
         parserTokens.add(newToken);
     }
