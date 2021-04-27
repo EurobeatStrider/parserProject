@@ -26,6 +26,7 @@ public class ScanLogic {
         tokenTypes.put("(", "lparen");
         tokenTypes.put(")", "rparen");
         tokenTypes.put("id", "ID");
+        tokenTypes.put("digit", "DIGIT");
         tokenTypes.put("read", "read");
         tokenTypes.put("write", "write");
 
@@ -150,7 +151,7 @@ public class ScanLogic {
         }
 
         if (digitPattern.matcher(input.substring(beginning, --pos)).find()) {
-            pushToken(new Token(tokenTypes.get("id"), input.substring(beginning, pos)));
+            pushToken(new Token(tokenTypes.get("digit"), input.substring(beginning, pos)));
             pos--;
             return;
         }
