@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScanLogic {
@@ -16,9 +15,6 @@ public class ScanLogic {
     private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");    //any digit or float
     private final Pattern IDPattern = Pattern.compile("^[a-zA-Z_]+(?:\\w|-)*$");              //any word character
     private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
-
-    private Matcher match;  //may not needed
-
 
     static {
         tokenTypes = new Hashtable<>();
@@ -82,7 +78,6 @@ public class ScanLogic {
         if (tossError) {
             System.out.println("An error occurred. Please remember to close comments and to make sure : properly assigns.");
             System.out.printf("Invalid syntax at %d '%c' \n", pos, input.charAt(pos));
-            return;
         }
 
 
@@ -97,7 +92,6 @@ public class ScanLogic {
 
         //checks if substring equals '/*'
         if (divType != null && divType.equals("/*")) {
-            int prev = pos; //for debugging
             pos += 2;
             while (pos < input.length() - 1 && !input.substring(pos, pos + 2).equals("*/"))
                 pos++;
@@ -106,6 +100,7 @@ public class ScanLogic {
             return;
         }
 
+        assert divType != null;
         if (divType.equals("//")) {
             System.out.printf("Div operator found at %d\n", pos);
             pos += 2;
@@ -125,7 +120,7 @@ public class ScanLogic {
     }
 
     //Checks for assign tokens
-    boolean detAssign(String input) {
+    void detAssign(String input) {
         String subStr = null;
         if (pos < input.length() - 1)           //prevent index out of bounds error
             subStr = input.substring(pos, pos + 2);
@@ -137,13 +132,12 @@ public class ScanLogic {
             ));
 
             pos++;
-            return true;
+            return;
         }
         tossError = true;
-        return tossError;
     }
 
-    //Cheeck for digits
+    //Check for digits
     void detDigit(String input) {
         int beginning = pos;
         if (input.charAt(pos) == '.')
@@ -175,8 +169,8 @@ public class ScanLogic {
             read = input.substring(pos, pos + 4);
             write = input.substring(pos, pos + 5);
 
-            if (read.toLowerCase().equals("read") || write.toLowerCase().equals("write")) {
-                if (read.toLowerCase().equals("read")) {
+            if (read.equalsIgnoreCase("read") || write.equalsIgnoreCase("write")) {
+                if (read.equalsIgnoreCase("read")) {
                     pushToken(new Token(tokenTypes.get(read.toLowerCase()), read));
                     pos += 3;
                 } else {
@@ -205,7 +199,6 @@ public class ScanLogic {
 
     }
 
-
     public void printTokens() {
         StringBuilder list = new StringBuilder();
         list.append("Token List\n");
@@ -213,43 +206,11 @@ public class ScanLogic {
         for (Token t : tokens)
             list.append(String.format("\t%s\n", t.toString()));
         list.append("}\n");
-        System.out.println(list.toString());
-    }
-
-    //TODO: to be deleted
-    private void pushIDToken(String type, String id) {
-        Token idToken = new Token();
-        //idToken.setID(type, id);
-        tokens.add(idToken);
+        System.out.println(list);
     }
 
     private void pushToken(Token token) {
         if (token != null)
             tokens.add(token);
     }
-
-    /*void getTokens() //Scope of changes for Project 2
-    {
-        //We need the parser logic
-
-        for(Token current : tokens)
-        {
-            System.out.print(current.get() + " ");
-        }
-    }
-
-    public static Dictionary<String, String> getTokenTypes() {
-        return tokenTypes;
-    }
-
-    boolean supportNumber(String input)
-    {
-        match = digitPattern.matcher(input);
-        return match.find();
-    }
-    boolean supportLetter(String input)
-    {
-        match = IDPattern.matcher(input);
-        return match.find();
-    }*/
 }
