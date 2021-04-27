@@ -1,3 +1,4 @@
+/*
 import java.util.ArrayList;
 
 class parser {
@@ -15,191 +16,93 @@ class parser {
     }
 
     public void parseStmtList(ArrayList<token> list){
-        if(raiseIndex(index, list)){
-            System.out.println(getIndent(indent) +"<Stmt_List>");
-            indent++;
+        System.out.println(getIndent(indent) +"<Stmt_List>");
+        indent++;
+        if(index <= list.size()) { //Possible error point.
             parseStmt(list);
             parseStmtList(list);
-            indent--;
-            System.out.println(getIndent(indent) +"<Stmt_List>");
         }
-        else {
-            //End of Valid List.
-        }
+        indent--;
+        System.out.println(getIndent(indent) +"<Stmt_List>");
     }
 
     public void parseStmt(ArrayList<token> list){
-        if(raiseIndex(index, list)) {
-            System.out.println(getIndent(indent) +"<Stmt>");
-            indent++;
-            if(list.get(index).equals("id")){ //Form must be 'id' 'assign' <expr>
-                parseID(list); //Parse ID
-                if(raiseIndex(index, list)) {
-                    if(list.get(index).equals("=")) { //Checks to make sure the input is right
-                        System.out.println(getIndent(indent) + "<Assign>");
-                        indent++;
-                        System.out.println(getIndent(indent) + list.get(index).get()); //Prints the "="
-                        indent--;
-                        System.out.println(getIndent(indent) + "</Assign>");
-                        parseExpr(list); //Advances to expr parser.
-                        indent--;
-                        System.out.println(getIndent(indent) + "</Stmt>");
-                    }
-                }
-            }
-            else if(list.get(index).equals("read")){ //Form must be 'read' <id>
-                System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
-                indent++;
-                System.out.println(getIndent(indent) + list.get(index).get());
-                indent--;
-                System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
-                parseID(list); //ID Check
-                indent--;
-                System.out.println(getIndent(indent) + "</Stmt>");
-            }
-            else if(list.get(index).equals("write")){ //Form must be 'write' <expr>
-                System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
-                indent++;
-                System.out.println(getIndent(indent) + list.get(index).get());
-                indent--;
-                System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
-                parseExpr(list); //Parse Expression
-                indent--;
-                System.out.println(getIndent(indent) + "</Stmt>");
+        System.out.println(getIndent(indent) +"<Stmt>");
+        indent++;
+        if(list.get(index).equals("id")){ //Form must be 'id' 'assign' <expr>
+            parseID(list); //Parse ID
+            index++; //advances to next token.
+            if(list.get(index).equals("=")) { //Checks to make sure the input is right
+                System.out.println(getIndent(indent) + "<Assign>");
+                index++;
+                System.out.println(getIndent(indent) + list.get(index).get()); //Prints the "="
+                index--;
+                System.out.println(getIndent(indent) + "</Assign>");
+                parseExpr(list); //Advances to expr parser.
             }
             else{
-                //Toss an error here.
+                //toss error here
             }
         }
+        if(list.get(index).equals("read")){ //Form must be 'read' <id>
+            System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).get());
+            indent--;
+            System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
+            index++; //Advance index.
+            parseID(list); //ID Check
+        }
+        if(list.get(index).equals("write")){ //Form must be 'write' <expr>
+            System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).get());
+            indent--;
+            System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
+            index++; //Advance index.
+            parseExpr(list); //Parse Expression
+        }
+        else{
+            //Toss an error here.
+        }
+        indent--;
+        System.out.println(getIndent(indent) + "</Stmt>");
     }
 
     public void parseExpr(ArrayList<token> list){
-        if(raiseIndex(index, list)) {
-            parseTerm(list);
-            parseTermTail(list);
-        }
-        else {
-            //toss error.
-        }
+        parseTerm(list);
+        index++;
+        parseTermTail(list);
     }
 
     public void parseTermTail(ArrayList<token> list){
-        if(raiseIndex(index, list)) {
-            parseAddOp(list);
-            parseFactor(list);
-            parseTermTail(list);
-        }
-        else{
-            //end of valid list found.
-        }
     }
 
     public void parseTerm(ArrayList<token> list){
-        if(raiseIndex(index,list)){
-            parseFactor(list);
-            parseFactTail(list);
-        }
-        else {
-            //toss error
-        }
     }
 
     public void parseFactTail(ArrayList<token> list){
-        if(raiseIndex(index,list)){
-            parseMultOp(list);
-            parseFactor(list);
-            parseFactTail(list);
-        }
-        else {
-            //end of valid list found.
-        }
     }
 
     public void parseFactor(ArrayList<token> list){
-        if(raiseIndex(index,list)) {
-            if(list.get(index).get().equals("(")){
-
-            }
-            else if(list.get(index).get().equals("id")){
-
-            }
-            else if(list.get(index).get().equals("number")){
-
-            }
-        }
-        else {
-            //toss error
-        }
     }
 
     public void parseAddOp(ArrayList<token> list){
-        if(raiseIndex(index,list)){
-            String operator = "+";
-            if(list.get(index).get().equals("minus"))
-                operator = "-";
-            if(list.get(index).get().equals("minus") || list.get(index).get().equals("plus")){
-                indent++;
-                System.out.println(getIndent(indent) + "<AddOp>");
-                indent++;
-                System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
-                indent++;
-                System.out.println(getIndent(indent) + operator);
-                indent--;
-                System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
-                indent--;
-                System.out.println(getIndent(indent) + "</AddOp>");
-                indent--;
-            }
-            else{
-                //toss error
-            }
-        }
-        else{
-            //toss error
-        }
     }
 
     public void parseMultOp(ArrayList<token> list){
-        if(raiseIndex(index,list)){
-            String operator = "*";
-            if(list.get(index).get().equals("divide"))
-                operator = "/";
-            if(list.get(index).get().equals("times") || list.get(index).get().equals("divide")){
-                indent++;
-                System.out.println(getIndent(indent) + "<MultOp>");
-                indent++;
-                System.out.println(getIndent(indent) + "<"+list.get(index)+">");
-                indent++;
-                System.out.println(getIndent(indent) + operator);
-                indent--;
-                System.out.println(getIndent(indent) + "</"+list.get(index)+">");
-                indent--;
-                System.out.println(getIndent(indent) + "</MultOp>");
-                indent--;
-            }
-            else {
-                //toss error
-            }
-        }
-        else {
-            //toss error
-        }
     }
 
     public void parseID(ArrayList<token> list){
-        if(raiseIndex(index, list)) {
-            if (list.get(index).get() == "id") {
-                indent++;
-                System.out.println(getIndent(indent) + "<ID>");
-                indent++;
-                System.out.println(getIndent(indent) + list.get(index).getID());
-                indent--;
-                System.out.println(getIndent(indent) + "</ID>");
-                indent--;
-            }
-            else {
-                //Toss error!
-            }
+        if(list.get(index).get() == "id"){
+            System.out.println(getIndent(indent) + "<ID>");
+            indent++;
+            System.out.println(getIndent(indent) + list.get(index).getID());
+            indent--;
+            System.out.println(getIndent(indent) + "</ID>");
+        }
+        else {
+            //Toss error!
         }
     }
 
@@ -211,13 +114,5 @@ class parser {
         return out;
     }
 
-    private boolean raiseIndex(int index, ArrayList<token> list){
-        if(index < list.size()){
-            index++;
-            return true;
-        }
-        else
-            return false;
-    }
-
 }
+*/

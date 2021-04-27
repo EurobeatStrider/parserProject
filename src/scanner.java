@@ -1,36 +1,32 @@
+/*
+* Project 2 parse v1.0
+*
+ */
+
 import java.io.IOException;
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.*;
+import java.util.Scanner;
 
 public class scanner
 {
-    public static void main(String args[]) throws IOException
+    public static void main(String[] args) throws IOException
     {
         ScanLogic newScan = new ScanLogic();
-        String rawInput = "";
-        File inputFile = new File("inputFile.txt");
-        Scanner reader = new Scanner(inputFile);
+        StringBuilder rawInput = new StringBuilder();   //content of file
+        Scanner reader = new Scanner(new File("inputFile.txt"));
 
-        //
-        while(reader.hasNext())
-        {
-            rawInput += reader.nextLine();
+        while(reader.hasNext()) {
+            rawInput.append(reader.nextLine());
+            rawInput.append("\n");
         }
-        rawInput += "$$";
+
         reader.close();
 
+        //System.out.println(rawInput.toString().substring(1,2));
 
-        char input[] = new char[rawInput.length()];
+       newScan.scan(rawInput.toString());
 
-        for(int i = 0; i < rawInput.length(); i++)
-        {
-            input[i] = rawInput.charAt(i);
-            System.out.println("Char found as " + input[i]);
-        }
-        System.out.println(rawInput);
-        newScan.scan(input);
+       newScan.printTokens();
     }
 }
 

@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class ScanLogic {
 
-    public static final Dictionary<String, String> TokenTypes;                          //Holds pair for tokens <token identifier, parse tree association>
+    public static final Dictionary<String, String> tokenTypes;                          //Holds pair for tokens <token identifier, parse tree association>
     private final ArrayList<Token> tokens;
 
     private boolean tossError;
@@ -17,18 +17,18 @@ public class ScanLogic {
     private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
 
     static {
-        TokenTypes = new Hashtable<>();
-        TokenTypes.put(":=", "assign");
-        TokenTypes.put("+", "plus");
-        TokenTypes.put("-", "minus");
-        TokenTypes.put("*", "times");
-        TokenTypes.put("/", "div");
-        TokenTypes.put("(", "lparen");
-        TokenTypes.put(")", "rparen");
-        TokenTypes.put("id", "ID");
-        TokenTypes.put("digit", "DIGIT");
-        TokenTypes.put("read", "read");
-        TokenTypes.put("write", "write");
+        tokenTypes = new Hashtable<>();
+        tokenTypes.put(":=", "assign");
+        tokenTypes.put("+", "plus");
+        tokenTypes.put("-", "minus");
+        tokenTypes.put("*", "times");
+        tokenTypes.put("/", "div");
+        tokenTypes.put("(", "lparen");
+        tokenTypes.put(")", "rparen");
+        tokenTypes.put("id", "ID");
+        tokenTypes.put("digit", "DIGIT");
+        tokenTypes.put("read", "read");
+        tokenTypes.put("write", "write");
 
     }
 
@@ -58,7 +58,7 @@ public class ScanLogic {
                 //check for plus, minus, times, lparen, rparen
             else if (checkMatch(input.charAt(pos), operatorPattern)) //((operatorPattern.matcher(Character.toString(input.charAt(pos)))).find())
                 pushToken(new Token(
-                        TokenTypes.get(Character.toString(input.charAt(pos))),
+                        tokenTypes.get(Character.toString(input.charAt(pos))),
                         Character.toString(input.charAt(pos))
                 ));
 
@@ -111,7 +111,7 @@ public class ScanLogic {
         }
 
         pushToken(new Token(
-                TokenTypes.get(Character.toString(input.charAt(pos))),
+                tokenTypes.get(Character.toString(input.charAt(pos))),
                 Character.toString(input.charAt(pos))
         ));
     }
@@ -129,7 +129,7 @@ public class ScanLogic {
         if (subStr != null && subStr.equals(":=")) {
             //pushToken(operatorTypes.get(subStr));
             pushToken(new Token(
-                    TokenTypes.get(subStr), subStr
+                    tokenTypes.get(subStr), subStr
             ));
 
             pos++;
@@ -151,7 +151,7 @@ public class ScanLogic {
         }
 
         if (digitPattern.matcher(input.substring(beginning, --pos)).find()) {
-            pushToken(new Token(TokenTypes.get("digit"), input.substring(beginning, pos)));
+            pushToken(new Token(tokenTypes.get("digit"), input.substring(beginning, pos)));
             pos--;
             return;
         }
@@ -172,10 +172,10 @@ public class ScanLogic {
 
             if (read.equalsIgnoreCase("read") || write.equalsIgnoreCase("write")) {
                 if (read.equalsIgnoreCase("read")) {
-                    pushToken(new Token(TokenTypes.get(read.toLowerCase()), read));
+                    pushToken(new Token(tokenTypes.get(read.toLowerCase()), read));
                     pos += 3;
                 } else {
-                    pushToken(new Token(TokenTypes.get(write.toLowerCase()), write));
+                    pushToken(new Token(tokenTypes.get(write.toLowerCase()), write));
                     pos += 4;
                 }
                 return;
@@ -192,7 +192,7 @@ public class ScanLogic {
         isValid = IDPattern.matcher(input.substring(beginning, --pos)).find();
 
         if (isValid) {
-            pushToken(new Token(TokenTypes.get("id"), input.substring(beginning, pos)));
+            pushToken(new Token(tokenTypes.get("id"), input.substring(beginning, pos)));
             return;
         }
 

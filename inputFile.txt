@@ -1,1 +1,7 @@
-(1 + 2 \ \*lululzz*\ := read write 3 * 4 - 5)
+(1 + 2 / /*lululzz*/ := read write 3.14 * 4 - 5)
+
+whitespace //hello
+
+heloo
+
+goodbyuy + 1 - 66.1
