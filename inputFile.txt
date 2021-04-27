@@ -1,5 +1,7 @@
-(1 + 2 / /*lululzz* := read write 3 * 4 - 5)
+(1 + 2 / /*lululzz := read write 3 * 4 - 5)
 
 whitespace
 
 heloo
+
+goodbyuy + 1 -6
