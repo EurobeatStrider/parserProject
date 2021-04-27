@@ -8,7 +8,7 @@ public class scanner
 {
     public static void main(String args[]) throws IOException
     {
-        scanLogic newScan = new scanLogic();
+        ScanLogic newScan = new ScanLogic();
         String rawInput = "";
         File inputFile = new File("inputFile.txt");
         Scanner reader = new Scanner(inputFile);

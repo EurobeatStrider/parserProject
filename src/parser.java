@@ -116,14 +116,27 @@ class parser {
     }
 
     public void parseFactor(ArrayList<token> list){
-        //TODO
+        if(raiseIndex(index,list)) {
+            if(list.get(index).get().equals("(")){
+
+            }
+            else if(list.get(index).get().equals("id")){
+
+            }
+            else if(list.get(index).get().equals("number")){
+
+            }
+        }
+        else {
+            //toss error
+        }
     }
 
     public void parseAddOp(ArrayList<token> list){
-        String operator = "+";
-        if(list.get(index).get().equals("minus"))
-            operator = "-";
         if(raiseIndex(index,list)){
+            String operator = "+";
+            if(list.get(index).get().equals("minus"))
+                operator = "-";
             if(list.get(index).get().equals("minus") || list.get(index).get().equals("plus")){
                 indent++;
                 System.out.println(getIndent(indent) + "<AddOp>");
@@ -147,7 +160,30 @@ class parser {
     }
 
     public void parseMultOp(ArrayList<token> list){
-        //TODO
+        if(raiseIndex(index,list)){
+            String operator = "*";
+            if(list.get(index).get().equals("divide"))
+                operator = "/";
+            if(list.get(index).get().equals("times") || list.get(index).get().equals("divide")){
+                indent++;
+                System.out.println(getIndent(indent) + "<MultOp>");
+                indent++;
+                System.out.println(getIndent(indent) + "<"+list.get(index)+">");
+                indent++;
+                System.out.println(getIndent(indent) + operator);
+                indent--;
+                System.out.println(getIndent(indent) + "</"+list.get(index)+">");
+                indent--;
+                System.out.println(getIndent(indent) + "</MultOp>");
+                indent--;
+            }
+            else {
+                //toss error
+            }
+        }
+        else {
+            //toss error
+        }
     }
 
     public void parseID(ArrayList<token> list){
