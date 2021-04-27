@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class scanLogic {
+public class ScanLogic {
 
     public static final Dictionary<String, String> tokenTypes;                          //Holds pair for tokens <token identifier, parse tree association>
     private final ArrayList<Token> tokens;
@@ -35,7 +35,7 @@ public class scanLogic {
 
     }
 
-    public scanLogic() {
+    public ScanLogic() {
         tokens = new ArrayList<>();
         tossError = false;
     }
