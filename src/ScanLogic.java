@@ -6,15 +6,6 @@ import java.util.regex.Pattern;
 public class ScanLogic {
 
     public static final Dictionary<String, String> tokenTypes;                          //Holds pair for tokens <token identifier, parse tree association>
-    private final ArrayList<Token> tokens;
-
-    private boolean tossError;
-    private int pos;
-
-    private final Pattern whiteSpacePattern = Pattern.compile("[ \\t\\n]");             //any new line, tab space or whitespace character
-    private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");    //any digit or float
-    private final Pattern IDPattern = Pattern.compile("^[a-zA-Z_]+(?:\\w|-)*$");              //any word character
-    private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
 
     static {
         tokenTypes = new Hashtable<>();
@@ -25,12 +16,20 @@ public class ScanLogic {
         tokenTypes.put("/", "div");
         tokenTypes.put("(", "lparen");
         tokenTypes.put(")", "rparen");
-        tokenTypes.put("id", "ID");
-        tokenTypes.put("digit", "DIGIT");
+        tokenTypes.put("id", "id");
+        tokenTypes.put("digit", "digit");
         tokenTypes.put("read", "read");
         tokenTypes.put("write", "write");
 
     }
+
+    private final ArrayList<Token> tokens;
+    private final Pattern whiteSpacePattern = Pattern.compile("[ \\t\\n]");             //any new line, tab space or whitespace character
+    private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");    //any digit or float
+    private final Pattern IDPattern = Pattern.compile("^[a-zA-Z_]+(?:\\w|-)*$");              //any word character
+    private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
+    private boolean tossError;
+    private int pos;
 
     public ScanLogic() {
         tokens = new ArrayList<>();
@@ -94,7 +93,7 @@ public class ScanLogic {
         //checks if substring equals '/*'
         if (divType != null && divType.equals("/*")) {
             pos += 2;
-            while (pos < input.length() - 1 && !input.substring(pos, pos + 2).equals("*/"))
+            while (pos < input.length() - 1 && !input.startsWith("*/", pos))
                 pos++;
             pos += 2; // only increment one because scan function loop will handle the rest
 
@@ -204,6 +203,7 @@ public class ScanLogic {
         StringBuilder list = new StringBuilder();
         list.append("Token List\n");
         list.append("{\n");
+        list.append(String.format("\t%s\n", Token.toStringHeader()));
         for (Token t : tokens)
             list.append(String.format("\t%s\n", t.toString()));
         list.append("}\n");
