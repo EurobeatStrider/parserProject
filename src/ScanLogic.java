@@ -39,7 +39,9 @@ public class ScanLogic {
 
     //Global Scannner
     public void scan(String input) {
+        char c;
         for (pos = 0; pos < input.length() && !tossError; pos++) {
+            c = input.charAt(pos);
 
             //check for new line, tab and whitespace characters
             if (checkMatch(input.charAt(pos), whiteSpacePattern)) {

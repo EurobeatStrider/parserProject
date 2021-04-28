@@ -1,6 +1,6 @@
 /*
-* Project 2 parse v1.0
-*
+ * Project 2 parse v1.0
+ *
  */
 
 import java.io.IOException;
@@ -14,23 +14,22 @@ public class scanner
         ScanLogic newScan = new ScanLogic();
         parser newParser = new parser();
         StringBuilder rawInput = new StringBuilder();   //content of file
-        Scanner reader = new Scanner(new File("inputFile.txt"));
+        Scanner reader = new Scanner(new File(args[0]));
 
         while(reader.hasNext()) {
             rawInput.append(reader.nextLine());
-            rawInput.append("\n");
+            rawInput.append(" \n ");
         }
 
         reader.close();
 
         //System.out.println(rawInput.toString().substring(1,2));
 
-       newScan.scan(rawInput.toString());
+        newScan.scan(rawInput.toString());
 
-       newScan.printTokens();
-       newScan.pushToken(new Token("$$","$$"));
-       newParser.parseProgram(newScan.getTokens());
-
+        newScan.printTokens();
+        newScan.pushToken(new Token("$$","$$"));
+        newParser.parseProgram(newScan.getTokens());
     }
 }
 
