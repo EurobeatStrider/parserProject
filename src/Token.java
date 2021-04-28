@@ -12,16 +12,16 @@ public class Token {
         this.id = id.trim();
     }
 
-    public String getType() {
+    public String get() {
         return type;
     }
 
-    public String getId() {
+    public String getID() {
         return id;
     }
 
     @Override
     public String toString() {
-        return String.format("%-9s:%5s", getType(), getId());
+        return String.format("%-9s:%5s", get(), getID());
     }
 }

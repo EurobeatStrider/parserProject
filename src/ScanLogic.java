@@ -22,7 +22,7 @@ public class ScanLogic {
         tokenTypes.put("+", "plus");
         tokenTypes.put("-", "minus");
         tokenTypes.put("*", "times");
-        tokenTypes.put("/", "div");
+        tokenTypes.put("/", "divide");
         tokenTypes.put("(", "lparen");
         tokenTypes.put(")", "rparen");
         tokenTypes.put("id", "ID");
@@ -210,8 +210,12 @@ public class ScanLogic {
         System.out.println(list);
     }
 
-    private void pushToken(Token token) {
+    public void pushToken(Token token) {
         if (token != null)
             tokens.add(token);
+    }
+
+    public ArrayList<Token> getTokens() {
+        return this.tokens;
     }
 }

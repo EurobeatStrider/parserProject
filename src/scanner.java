@@ -12,6 +12,7 @@ public class scanner
     public static void main(String[] args) throws IOException
     {
         ScanLogic newScan = new ScanLogic();
+        parser newParser = new parser();
         StringBuilder rawInput = new StringBuilder();   //content of file
         Scanner reader = new Scanner(new File("inputFile.txt"));
 
@@ -27,6 +28,9 @@ public class scanner
        newScan.scan(rawInput.toString());
 
        newScan.printTokens();
+       newScan.pushToken(new Token("$$","$$"));
+       newParser.parseProgram(newScan.getTokens());
+
     }
 }
 

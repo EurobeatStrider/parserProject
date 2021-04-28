@@ -1,7 +1,1 @@
-(1 + 2 / /*lululzz*/ := read write 3.14 * 4 - 5)
-
-whitespace //hello
-
-heloo
-
-goodbyuy + 1 - 66.1
+read x x := a + b /*comment*/ write ( a + b ) * 5
