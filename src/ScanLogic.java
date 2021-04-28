@@ -27,7 +27,7 @@ public class ScanLogic {
     private final Pattern whiteSpacePattern = Pattern.compile("[ \\t\\n]");             //any new line, tab space or whitespace character
     private final Pattern digitPattern = Pattern.compile("^\\.?\\d+\\.?(?:\\d+)?$");    //any digit or float
     private final Pattern IDPattern = Pattern.compile("^[a-zA-Z_]+(?:\\w|-)*$");              //any word character
-    private final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
+    public final Pattern operatorPattern = Pattern.compile("[+*\\-()]");               //any operator  { +, -, (, ) }
     private boolean tossError;
     private int pos;
 
@@ -79,7 +79,6 @@ public class ScanLogic {
             System.out.println("An error occurred. Please remember to close comments and to make sure : properly assigns.");
             System.out.printf("Invalid syntax at %d '%c' \n", pos, input.charAt(pos));
         }
-
 
     }
 
