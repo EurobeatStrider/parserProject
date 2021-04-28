@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.regex.Pattern;
-
+//Meremikwu and Nee
 public class ScanLogic {
 
     public static final Dictionary<String, String> tokenTypes;                          //Holds pair for tokens <token identifier, parse tree association>
