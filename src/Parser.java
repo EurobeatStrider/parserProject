@@ -6,9 +6,15 @@ class parser {
     private ArrayList parserTokens = new ArrayList<Token>();
 
     public void parseProgram(ArrayList<Token> list){
-        System.out.println(getIndent(indent) +"<Program>");
-        parseStmtList(list);
-        System.out.println(getIndent(indent) +"</Program>");
+        if(list.get(index).get().equals("ID") || list.get(index).get().equals("read") || list.get(index).get().equals("write")
+        || list.get(index).get().equals("$$")){
+            System.out.println(getIndent(indent) +"<Program>");
+            parseStmtList(list);
+            System.out.println(getIndent(indent) +"</Program>");
+        }
+        else {
+            System.out.println("ERROR: LIST WAS TAMPERED WITH");
+        }
     }
 
     public void parseStmtList(ArrayList<Token> list){
