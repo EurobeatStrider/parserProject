@@ -3,9 +3,7 @@ import java.util.ArrayList;
 class parser {
     private int indent = 0;
     private int index = 0;
-    private String output = "";
     private ArrayList parserTokens = new ArrayList<Token>();
-    boolean isError = false;
 
     public void parseProgram(ArrayList<Token> list){
         System.out.println(getIndent(indent) +"<Program>");
