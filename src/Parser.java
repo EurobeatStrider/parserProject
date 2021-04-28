@@ -48,8 +48,10 @@ class parser {
                     indent--;
                     System.out.println(getIndent(indent) + "</Assign>");
                     indent--;
-                    raiseIndex(index,list);
-                    parseExpr(list); //Advances to expr parser.
+                    if(raiseIndex(index,list))
+                        parseExpr(list); //Advances to expr parser.
+                    else
+                        System.out.println("ERROR: END OF TOKENS/EXPECTED EXPR");
                 }
             }
         }
@@ -65,7 +67,7 @@ class parser {
                 raiseIndex(index,list);
             }
             else{
-                System.out.println("ERROR: END OF LIST REACHED PREMATURELY");
+                System.out.println("ERROR: END OF TOKENS/EXPECTED ID");
             }
         }
         else if(list.get(index).get().equals("write")){ //Form must be 'write' <expr>
@@ -75,8 +77,10 @@ class parser {
             indent--;
             System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
             indent--;
-            raiseIndex(index,list);
-            parseExpr(list); //Parse Expression
+            if(raiseIndex(index,list))
+                parseExpr(list); //Parse Expression
+            else
+                System.out.println("ERROR: END OF TOKENS/EXPECTED EXPR");
         }
         else{
             System.out.println("ERROR: INVALID TOKEN IN PARSESTATEMENT");
@@ -160,10 +164,10 @@ class parser {
             System.out.println(getIndent(indent) + "<LPAREN>");
             indent++;
             System.out.println(getIndent(indent) + "(");
-            raiseIndex(index,list);
             indent--;
             System.out.println(getIndent(indent) + "</LPAREN>");
             indent--;
+            raiseIndex(index,list); //??
             parseExpr(list);
             if(list.get(index).get().equals("rparen")){
                 indent++;
@@ -201,16 +205,13 @@ class parser {
     }
 
     public void parseAddOp(ArrayList<Token> list){
-        String operator = "+";
-        if(list.get(index).get().equals("minus"))
-            operator = "-";
         if(list.get(index).get().equals("minus") || list.get(index).get().equals("plus")){
             indent++;
             System.out.println(getIndent(indent) + "<AddOp>");
             indent++;
             System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
             indent++;
-            System.out.println(getIndent(indent) + operator);
+            System.out.println(getIndent(indent) + list.get(index).getID());
             indent--;
             System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
             indent--;
@@ -224,22 +225,19 @@ class parser {
     }
 
     public void parseMultOp(ArrayList<Token> list){
-        String operator = "*";
-        if(list.get(index).get().equals("divide"))
-            operator = "/";
         if(list.get(index).get().equals("times") || list.get(index).get().equals("divide")){
             indent++;
             System.out.println(getIndent(indent) + "<MultOp>");
             indent++;
             System.out.println(getIndent(indent) + "<"+list.get(index).get()+">");
             indent++;
-            System.out.println(getIndent(indent) + operator);
-            raiseIndex(index,list);
+            System.out.println(getIndent(indent) + list.get(index).getID());
             indent--;
             System.out.println(getIndent(indent) + "</"+list.get(index).get()+">");
             indent--;
             System.out.println(getIndent(indent) + "</MultOp>");
             indent--;
+            raiseIndex(index,list);
         }
         else {
             //toss error
