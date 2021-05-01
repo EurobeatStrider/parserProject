@@ -195,6 +195,7 @@ public class ScanLogic {
 
         if (isValid) {
             pushToken(new Token(tokenTypes.get("id"), input.substring(beginning, pos)));
+            pos--;
             return;
         }
 

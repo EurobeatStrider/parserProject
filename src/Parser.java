@@ -30,7 +30,7 @@ class parser {
         else {
             //End of Valid List.
         }
-        System.out.println(getIndent(indent) +"<Stmt_List>");
+        System.out.println(getIndent(indent) +"</Stmt_List>");
         indent--;
     }
 
@@ -44,7 +44,7 @@ class parser {
                 if(list.get(index).get().equals("assign")) { //Checks to make sure the input is right
                     System.out.println(getIndent(indent) + "<Assign>");
                     indent++;
-                    System.out.println(getIndent(indent) + list.get(index).get()); //Prints the "="
+                    System.out.println(getIndent(indent) + list.get(index).getID()); //Prints the "="
                     indent--;
                     System.out.println(getIndent(indent) + "</Assign>");
                     indent--;

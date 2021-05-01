@@ -1,1 +1,1 @@
-x := ( a + + ) + c
+read x x := a + b /*comment*/ write ( a + b ) * 5
